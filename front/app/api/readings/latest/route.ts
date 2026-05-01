@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { appConfig, thresholds } from "@/lib/config";
 import { getLatestReading } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const deviceId = url.searchParams.get("device_id") ?? appConfig.defaultDeviceId;
+export async function GET(request: NextRequest) {
+  const deviceId =
+    request.nextUrl.searchParams.get("device_id") ?? appConfig.defaultDeviceId;
 
   try {
     const reading = await getLatestReading(deviceId);

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { appConfig, thresholds } from "@/lib/config";
 import { getHistoryReadings, getLatestReading, insertReading } from "@/lib/db";
@@ -25,7 +25,7 @@ function serverErrorResponse(error: unknown) {
   );
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const payload = validateReadingPayload(body);
@@ -43,17 +43,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return serverErrorResponse({ error });
+    return serverErrorResponse(error);
   }
 }
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const deviceId =
-    url.searchParams.get("device_id") ?? appConfig.defaultDeviceId;
-  const from = url.searchParams.get("from");
-  const to = url.searchParams.get("to");
-  const limit = url.searchParams.get("limit");
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const deviceId = searchParams.get("device_id") ?? appConfig.defaultDeviceId;
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const limit = searchParams.get("limit");
 
   try {
     const parsedFrom = parseDateQuery(from, "from");
