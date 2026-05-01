@@ -1,15 +1,15 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: garden-postgres
-    environment:
-      POSTGRES_DB: garden
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: smart-garden-front
+    restart: unless-stopped
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
+      - "4000:4000"
+    env_file:
+      - ./front/.env
+    environment:
+      PORT: "4000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
